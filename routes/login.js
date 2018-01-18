@@ -51,9 +51,10 @@ router.post('/signup', function(req, res, next) {
           }
         );
 
-        User.create(userObj, () => {
-          res.send({ token, boards: userObj.boards });
-        });
+        User.create(userObj)
+          .then(user => {
+            res.send({ token, boards: user.boards });
+          });
       }
     })
     .catch(e => {
