@@ -6,10 +6,24 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
+var login = require('./routes/login');
 var boards = require('./routes/boards');
+var tasks = require('./routes/tasks');
+var tasks = require('./routes/tasks');
 
-var MongoClient = require('mongodb').MongoClient;
+
+// mongoDB connection logs
+var mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost/tasks');
+
+var db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+  console.log('Connected to DB');
+});
+
 
 var app = express();
 
@@ -19,6 +33,8 @@ app.set('view engine', 'pug');
 
 app.use((req, res, next) => {
   res.append('Access-Control-Allow-Origin', ['*']);
+  res.append('Access-Control-Allow-Headers', ['*']);
+  res.append('Access-Control-Allow-Methods', ['*']);
   next();
 });
 
@@ -31,8 +47,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/users', users);
-app.use('/boards', boards);
+app.use('/api/login', login);
+app.use('/api/boards', boards);
+app.use('/api/tasks', tasks);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
