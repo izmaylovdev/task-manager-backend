@@ -16,19 +16,26 @@ router.post('/signin', function(req, res, next) {
     })
     .then(user => {
       if (user) {
-        res.send({ token: user.token, boards: user.boards });
+        res.json({ token: user.token, boards: user.boards });
       } else {
-        res.status(400).send('User dont find!');
+        User.findOne({ login: userData.login })
+          .then(user => {
+            if (user) {
+              res.status(400).json({ message: 'Wrong password!' });
+            } else {
+              res.status(400).json({ message: 'User dont find!' });
+            }
+          })
       }
     })
 });
 
 router.post('/signup', function(req, res, next) {
   var userData = req.body;
-  User.findOne(userData)
+  User.findOne({ login: userData.login })
     .then(user => {
       if (user) {
-        res.status(400).send('User allredy exist!');
+        res.status(400).json({ message: 'User already exist!' });
       } else if(userData.login && userData.password){
         var token = jwt.sign(userData, 'mysecretkey');
         var userObj = Object.assign(
@@ -50,19 +57,6 @@ router.post('/signup', function(req, res, next) {
       }
     })
     .catch(e => {
-    })
-});
-
-router.post('/logout', function(req, res, next) {
-  const token = req.headers.authorization,
-        newToken = jwt.sign(token, 'mysecretkey');
-
-  User.update({ token }, { $set: { token: newToken } })
-    .then(user => {
-      res.send(true);
-    })
-    .catch(e => {
-      res.status(400).send(e);
     })
 });
 
