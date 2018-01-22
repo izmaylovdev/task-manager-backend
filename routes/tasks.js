@@ -16,7 +16,7 @@ router.post('/', function (req, res, next) {
       Board.findOneAndUpdate({ _id: boardId }, { $push: { tasks: task } })
         .then(board => res.send(task));
     })
-    .catch(e => res.error(e));
+    .catch(e => res.send(e));
 });
 
 router.put('/', function (req, res, next) {
@@ -25,7 +25,7 @@ router.put('/', function (req, res, next) {
 
   Task.updateOne({ _id: task._id }, task)
     .then(e => res.send(task))
-    .catch(e => res.error(e));
+    .catch(e => res.send(e));
 });
 
 router.delete('/', function (req, res, next) {
@@ -36,7 +36,7 @@ router.delete('/', function (req, res, next) {
     Task.findByIdAndRemove(id)
       .then(board => Board.findByIdAndUpdate(boardId, { $pullAll: { tasks: [ id ] } }))
       .then(e => res.send({ status: 'OK' }))
-      .catch(e => res.error(e));
+      .catch(e => res.send(e));
   }
 });
 
@@ -48,7 +48,7 @@ router.post('/move', function (req, res, next) {
     Board.findByIdAndUpdate(destId, { $push: { tasks: taskId } })
       .then(board => Board.findByIdAndUpdate(fromId, { $pull: { tasks: taskId } }))
       .then(e => res.send({ status: 'OK' }))
-      .catch(e => res.error(e));
+      .catch(e => res.send(e));
   }
 });
 
